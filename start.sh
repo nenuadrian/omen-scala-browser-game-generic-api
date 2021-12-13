@@ -1,0 +1,1 @@
+java -jar ./target/scala-2.12/omen-assembly-0.1.jar

@@ -1,0 +1,130 @@
+name: space
+
+entities:
+  - id: players
+    own:
+      - planets
+    have:
+      - id: dark_matter
+        default: 10
+      - id: dark_matter2
+        default: 101
+
+  - id: planets
+    tag: planet
+    own:
+      - shipmanship
+      - espionage
+
+      - metal-mine
+      - crystal-mine
+      - shipyard
+
+      - small-fighter
+      - cargo-carrier
+      - death-star
+    have:
+      - id: crystal
+        default: 100
+        hourly_rate_attribute: crystal-hourly
+        max: 200
+      - id: crystal-hourly
+        default: 0
+      - id: metal
+        default: 100
+        hourly_rate: 0
+        max: 100
+      - id: deuterium
+        default: 100
+        hourly_rate: 0
+        max: 100
+      - id: energy_usage
+        default: 0
+        max: 0
+      - id: energy
+        default: 10
+
+  - id: shipmanship
+    tag: research
+    upgradeable: true
+  - id: espionage
+    upgradeable: true
+    tag: research
+
+  - id: metal-mine
+    tag: building
+    upgradeable: true
+    attributes:
+      - id: parent[crystal-hourly]
+        formula: "[amount] *  10"
+    requirements:
+      attributes:
+        - id: parent[crystal]
+          formula: "parent[crystal] - 1"
+        - id: parent.parent[dark_matter]
+          formula: "parent.parent[dark_matter] / 2"
+  - id: crystal-mine
+    tag: building
+    upgradeable: true
+    requirements:
+      attributes:
+        - id: parent[crystal]
+          formula: "100 * [amount] + 100"
+      entities:
+        - id: parent[metal-mine]
+          formula: "1 * [amount] + 1"
+        - id: parent[shipmanship]
+          formula: "2 * [amount] + 1"
+  - id: shipyard
+    tag: building
+    upgradeable: true
+    requirements:
+      attributes:
+        - id: parent[crystal]
+          formula: "100 * ([amount] + 1)"
+      entities:
+        - id: parent[metal-mine]
+          formula: "1 * [amount] + 1"
+        - id: parent[shipmanship]
+          formula: "2 * [amount] + 2"
+
+  - id: small-fighter
+    aggregateable: true
+    tag: ship
+    requirements:
+      entities:
+        - id: parent[shipyard]
+          formula: "1"
+    have:
+      - id: attack
+        formula: "100"
+      - id: storage
+        formula: "100"
+  - id: cargo-carrier
+    tag: ship
+    aggregateable: true
+    requirements:
+      entities:
+        - id: parent[shipyard]
+          formula: "1"
+    have:
+      - id: attack
+        formula: "100"
+      - id: storage
+        formula: "100"
+  - id: death-star
+    tag: ship
+    aggregateable: true
+    requirements:
+      entities:
+        - id: parent[shipyard]
+          formula: "1"
+      attributes:
+        - id: parent.parent[dark_matter]
+          formula: "100"
+    have:
+      - id: attack
+        formula: "100"
+      - id: storage
+        formula: "parent.parent[dark_matter] * 100"
+

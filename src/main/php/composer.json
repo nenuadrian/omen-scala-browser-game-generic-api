@@ -1,0 +1,13 @@
+{
+    "name": "adriannenu/omen",
+    "authors": [
+        {
+            "name": "Adrian Nenu",
+            "email": "adrian.nenu@gmail.com"
+        }
+    ],
+    "require": {
+      "ext-json": "*",
+        "nategood/httpful": "^0.3.2"
+    }
+}
