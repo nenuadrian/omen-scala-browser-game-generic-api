@@ -48,7 +48,7 @@ object TaskModel {
         statement.setString(1, id)
         statement
       }
-      case (None, None) => throw new UnsupportedOperationException
+      case _ => throw new UnsupportedOperationException
     }
     statement.setInt(2, if (acknowledged) 1 else 0)
     preparedStatement2List(statement)

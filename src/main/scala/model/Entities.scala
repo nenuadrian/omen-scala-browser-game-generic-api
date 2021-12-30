@@ -60,7 +60,7 @@ object EngineConfigUtils {
     } else None
   }
 
-  def withDb[T](method: Connection => T)(implicit db: BasicDataSource) = {
+  def withDb[T](method: Connection => T)(implicit db: BasicDataSource): T = {
     val conn = db.getConnection
     try {
       method(conn)

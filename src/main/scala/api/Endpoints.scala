@@ -9,7 +9,7 @@ import core.Engine
 import model.JsonSupport._
 import model._
 import org.apache.logging.log4j.scala.Logging
-import spray.json.{DefaultJsonProtocol, JsNull, JsNumber, JsObject, JsString, JsValue, enrichAny}
+import spray.json._
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
@@ -19,7 +19,7 @@ case class RefDataQuery(key: String, value: String)
 case class EntitiesQuery(byIdentifier: Option[String] = None, refDataFilters: Option[List[RefDataQuery]] = None,
                          parent_entity_id: Option[String] = None, tag: Option[String] = None, primaryParentEntityId: Option[String] = None)
 
-class WebRoutes(omen: Engine)(implicit system: ActorSystem, materializer: ActorMaterializer,
+class Endpoints(omen: Engine)(implicit system: ActorSystem, materializer: ActorMaterializer,
                               executionContext: ExecutionContextExecutor)
   extends Logging with CORSSupport with SprayJsonSupport with DefaultJsonProtocol {
   implicit val timeout: Timeout = Timeout(10000 seconds)
@@ -43,7 +43,9 @@ class WebRoutes(omen: Engine)(implicit system: ActorSystem, materializer: ActorM
   implicit def tojs[T](a: T)(implicit writer : spray.json.JsonWriter[T]) : spray.json.JsValue = writer.write(a)
 
   val route: Route = respondWithCORS {
-    path("ping") {
+    pathSingleSlash {
+      response(() => true)
+    } ~ path("ping") {
       response(() => true)
     } ~ path("configuration") {
       response(() => omen.config)
@@ -155,7 +157,32 @@ class WebRoutes(omen: Engine)(implicit system: ActorSystem, materializer: ActorM
       }}
     } ~ pathPrefix("tech-tree") {
       get {
-        response(() => omen.leaderboard("player"))
+        val mapping = omen.config.entities.zipWithIndex.map(e => e._1.id -> e._2).toMap
+        response(() => JsObject(
+          "entities" -> JsArray(
+            omen.config.entities.zipWithIndex.map(e => JsObject(
+              "id" -> JsNumber(e._2),
+              "label" -> JsString(e._1.id),
+            )).toVector
+          ),
+          "edges" -> JsArray(
+            omen.config.entities.flatMap(e => {
+              (/*e.have.map(have => have.map(h => {
+                JsObject(
+                  "type" -> JsString("have"),
+                  "from" -> JsNumber(mapping(e.id)),
+                  "to" -> JsString(h.id)
+                )
+              })).getOrElse(List()) ++ */e.requirements.flatMap(req => req.entities.map(req => {
+                req.map(r => JsObject(
+                  "type" -> JsString("requirement"),
+                  "from" -> JsNumber(mapping(e.id)),
+                  "to" -> JsNumber(mapping(r.id.replace("parent[", "").replace("]", "")))
+                ))
+              })).getOrElse(List())).toVector
+            }).toVector
+          )
+        ))
       }
     }
   }

@@ -3,7 +3,7 @@ package core
 import akka.actor.ActorSystem
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.stream.ActorMaterializer
-import api.WebRoutes
+import api.Endpoints
 import core.Engine.{DependencyTree, Node}
 import model._
 import omen.Omen.logger
@@ -43,7 +43,7 @@ class Engine(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) 
   implicit val system: ActorSystem = ActorSystem("omen-as")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-  val webRoutes = new WebRoutes(this)
+  val webRoutes = new Endpoints(this)
 
   private val scheduler = system.scheduler
   private val hourlyAttributes: Seq[(EntityConfig, AttributeConfig)] = config.entities.filter(_.have.isDefined).flatMap(e => e.have.get.filter(_.hourly_rate_attribute.isDefined).map(h => e -> h))
