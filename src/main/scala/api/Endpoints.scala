@@ -156,35 +156,35 @@ class Endpoints(omen: Engine)(implicit system: ActorSystem, materializer: ActorM
         }
       }}
     } ~ pathPrefix("tech-tree") {
-      get {
-        val mapping = omen.config.entities.zipWithIndex.map(e => e._1.id -> e._2).toMap
-        response(() => JsObject(
-          "entities" -> JsArray(
-            omen.config.entities.zipWithIndex.map(e => JsObject(
-              "id" -> JsNumber(e._2),
-              "label" -> JsString(e._1.id),
-            )).toVector
-          ),
-          "edges" -> JsArray(
-            omen.config.entities.flatMap(e => {
-              (/*e.have.map(have => have.map(h => {
-                JsObject(
-                  "type" -> JsString("have"),
-                  "from" -> JsNumber(mapping(e.id)),
-                  "to" -> JsString(h.id)
-                )
-              })).getOrElse(List()) ++ */e.requirements.flatMap(req => req.entities.map(req => {
-                req.map(r => JsObject(
-                  "type" -> JsString("requirement"),
-                  "from" -> JsNumber(mapping(e.id)),
-                  "to" -> JsNumber(mapping(r.id.replace("parent[", "").replace("]", "")))
-                ))
-              })).getOrElse(List())).toVector
-            }).toVector
-          )
-        ))
+      path("html") {
+        getFromResource("html/tech.html") // uses implicit ContentTypeResolver
+      } ~ pathEnd {
+        get {
+          val mapping = omen.config.entities.zipWithIndex.map(e => e._1.id -> e._2).toMap
+          response(() => JsObject(
+            "entities" -> JsArray(
+              omen.config.entities.zipWithIndex.map(e => JsObject(
+                "id" -> JsNumber(e._2),
+                "label" -> JsString(e._1.id),
+              )).toVector
+            ),
+            "edges" -> JsArray(
+              omen.config.entities.flatMap(e => {
+                (
+
+
+                  e.requirements.flatMap(req => req.entities.map(req => {
+                    req.map(r => JsObject(
+                      "type" -> JsString("requirement"),
+                      "from" -> JsNumber(mapping(e.id)),
+                      "to" -> JsNumber(mapping(r.id.replace("parent[", "").replace("]", "")))
+                    ))
+                  })).getOrElse(List())).toVector
+              }).toVector
+            )
+          ))
+        }
       }
     }
   }
-
 }

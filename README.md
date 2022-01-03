@@ -21,28 +21,6 @@ WIP
 
 ## Visualize the tech-tree and game config
 
-By using the tech-tree endpoint you can place the data in the following HTML page and obtain this type of visualisation of what the engine knows about your game
+An HTML endpoint is available which renders a visualisation of the entire config by using the http://localhost:8083/tech-tree endpoint at http://localhost:8083/tech-tree/html
 
 ![tech](docs/diagram-tech-tree.png)
-
-```
-<script type="text/javascript" src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
-<div id="mynetwork"></div>
-<script>
-    // create an array with nodes
-    var nodes = new vis.DataSet([]);
-    
-    // create an array with edges
-    var edges = new vis.DataSet([]);
-    
-    // create a network
-    var container = document.getElementById("mynetwork");
-    var data = {
-      nodes: nodes,
-      edges: edges,
-    };
-    var options = {};
-    var network = new vis.Network(container, data, options);
-</script>
-
-```

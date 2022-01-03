@@ -1,0 +1,37 @@
+<title>Tech Tree</title>
+<script type="text/javascript" src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+<div id="mynetwork"></div>
+<script>
+
+$( document ).ready(function() {
+    var jqxhr = $.ajax( "/tech-tree" )
+      .done(function(data) {
+      console.log(data)
+        // create an array with nodes
+            var nodes = new vis.DataSet(data.data.entities);
+
+            // create an array with edges
+            var edges = new vis.DataSet(data.data.edges);
+
+            // create a network
+            var container = document.getElementById("mynetwork");
+            var data = {
+              nodes: nodes,
+              edges: edges,
+            };
+            var options = {};
+            var network = new vis.Network(container, data, options);
+      })
+      .fail(function() {
+        alert( "error" );
+      })
+      .always(function() {
+      });
+
+});
+
+</script>
