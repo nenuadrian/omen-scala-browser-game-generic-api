@@ -171,9 +171,11 @@ class Endpoints(omen: Engine)(implicit system: ActorSystem, materializer: ActorM
             "edges" -> JsArray(
               omen.config.entities.flatMap(e => {
                 (
-
-
-                  e.requirements.flatMap(req => req.entities.map(req => {
+                  e.own.map(req => req.map(own => JsObject(
+                    "type" -> JsString("owns"),
+                    "from" -> JsNumber(mapping(e.id)),
+                    "to" -> JsNumber(mapping(own))
+                  ))).getOrElse(List()) ++ e.requirements.flatMap(req => req.entities.map(req => {
                     req.map(r => JsObject(
                       "type" -> JsString("requirement"),
                       "from" -> JsNumber(mapping(e.id)),
