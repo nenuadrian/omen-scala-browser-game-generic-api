@@ -2,6 +2,7 @@ package core.storage
 
 import org.apache.commons.dbcp2.BasicDataSource
 
+import java.util.Date
 import scala.util.{Properties, Random}
 
 trait H2Database {
@@ -9,7 +10,7 @@ trait H2Database {
   protected def generateDataSource: BasicDataSource = {
     val clientConnPool = new BasicDataSource()
     clientConnPool.setDriverClassName("org.h2.Driver")
-    clientConnPool.setUrl("jdbc:h2:~/test" + Random.nextInt())
+    clientConnPool.setUrl("jdbc:h2:~/test" + new Date().getTime)
     clientConnPool.setInitialSize(2)
     clientConnPool.setUsername("sa")
     clientConnPool.setPassword("")

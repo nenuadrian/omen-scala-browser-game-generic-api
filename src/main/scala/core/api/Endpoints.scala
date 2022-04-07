@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import core.base.EngineBase
 import core.impl.EngineH2
-import model.JsonSupport._
+import model.json.JsonSupport._
 import model._
 import org.apache.logging.log4j.scala.Logging
 import spray.json._

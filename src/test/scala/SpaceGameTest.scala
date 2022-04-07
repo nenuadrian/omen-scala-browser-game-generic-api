@@ -1,5 +1,5 @@
 
-import model.JsonSupport._
+import model.json.JsonSupport._
 import model._
 import spray.json._
 

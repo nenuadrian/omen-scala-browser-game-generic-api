@@ -11,28 +11,27 @@ import org.apache.logging.log4j.scala.Logging
 
 import scala.util.Properties
 
-object Omen extends App with Logging with H2Database {
-  val configsPath = Properties.envOrNone("config_path")
-  val port = Properties.envOrElse("PORT", 8083.toString).toInt
+trait Omen extends Logging with H2Database {
+  def leaderboardAgent(player: Entity, entities: List[Entity]): List[(String, Int)]
 
-  implicit val system: ActorSystem = ActorSystem("web-server")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  def start(): Unit = {
+    val configsPath = Properties.envOrNone("config_path")
+    val port = Properties.envOrElse("PORT", 8083.toString).toInt
 
-  val ds = generateDataSource
-  refresh(ds)
+    implicit val system: ActorSystem = ActorSystem("web-server")
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  def leaderboardAgent(player: Entity, entities: List[Entity]): List[(String, Int)] = {
+    val ds = generateDataSource
+    refresh(ds)
 
-    List(("main", entities.count(_.id == "planets")))
+    val engine = new EngineH2(configsPath match {
+      case Some(path) => OmenConfigValidator.parse(path)
+      case _ => OmenConfigValidator.parse(ClassLoader
+        .getSystemResourceAsStream("game_configs/space.yaml"))
+    }, leaderboardAgent)(ds, new TimeProvider())
+
+    val bindingFuture = Http().bindAndHandle(engine.webRoutes.route, "0.0.0.0", port)
+
+    logger.info(s"OMEN Engine is now ONLINE on port $port!")
   }
-
-  val engine = new EngineH2(configsPath match {
-    case Some(path) => OmenConfigValidator.parse(path)
-    case _ => OmenConfigValidator.parse(ClassLoader
-      .getSystemResourceAsStream("game_configs/space.yaml"))
-  }, leaderboardAgent)(ds, new TimeProvider())
-
-  private val bindingFuture = Http().bindAndHandle(engine.webRoutes.route, "0.0.0.0", port)
-
-  logger.info(s"OMEN Engine is now ONLINE on port $port!")
 }

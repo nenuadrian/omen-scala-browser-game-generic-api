@@ -1,6 +1,6 @@
-package model
+package model.yaml
 
-import model.CustomYaml.{yamlFormat2, yamlFormat5, yamlFormat7}
+import model.{AttributeConfig, EngineConfig, EntityConfig, EntityRequirements}
 import net.jcazevedo.moultingyaml.DefaultYamlProtocol
 
 object CustomYaml extends DefaultYamlProtocol {
