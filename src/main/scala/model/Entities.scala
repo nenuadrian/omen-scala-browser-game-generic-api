@@ -19,6 +19,36 @@ case class RequirementsResponse(attributes: List[RequirementResponse], entities:
 
 case class EngineConfig(name: String,
                         entities: List[EntityConfig] = List()) {
+  def toGraph: JsValue = {
+    val mapping = entities.zipWithIndex.map(e => e._1.id -> e._2).toMap
+    JsObject(
+      "entities" -> JsArray(
+        entities.zipWithIndex.map(e => JsObject(
+          "id" -> JsNumber(e._2),
+          "label" -> JsString(e._1.id),
+        )).toVector
+      ),
+      "edges" -> JsArray(
+        entities.flatMap(e => {
+          (
+            e.own.map(req => req.map(own => JsObject(
+              "type" -> JsString("owns"),
+              "label" -> JsString("owns"),
+              "from" -> JsNumber(mapping(e.id)),
+              "to" -> JsNumber(mapping(own))
+            ))).getOrElse(List()) ++ e.requirements.flatMap(req => req.entities.map(req => {
+              req.map(r => JsObject(
+                "label" -> JsString("requirement"),
+                "type" -> JsString("requirement"),
+                "from" -> JsNumber(mapping(e.id)),
+                "to" -> JsNumber(mapping(r.id.replace("parent[", "").replace("]", "")))
+              ))
+            })).getOrElse(List())).toVector
+        }).toVector
+      )
+    )
+  }
+
   def entityConfigById(id: String): Option[EntityConfig] = entities.find(_.id == id)
 }
 

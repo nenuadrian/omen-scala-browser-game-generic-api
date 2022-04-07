@@ -27,13 +27,14 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
   import model.RefDataProtocol._
   import model.TaskProtocol._
 
-  private val status200 = complete(JsObject("status" -> JsNumber(200)))
-
   private def response(foo: () => JsValue): StandardRoute = {
     complete(try {
       JsObject("status" -> JsNumber(200), "data" -> foo())
     } catch {
-      case e: Throwable => JsObject("status" -> JsNumber(500), "error" -> JsString(e.getMessage))
+      case e: Throwable => {
+        logger.error(e.getMessage, e)
+        JsObject("status" -> JsNumber(500), "error" -> JsString(e.getMessage))
+      }
     })
   }
 
@@ -48,7 +49,7 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
       response(() => omen.config)
     } ~ path("player") {
       put {
-        response(() => omen.createEntityForRequest(CreateEntityRequest("players", None, None)))
+        response(() => omen.createEntity(CreateEntityRequest("players", None, None)))
       }
     } ~ pathPrefix("entities") {
         parameter("primaryParentEntityId" ?) { primaryParentEntityId => {
@@ -122,7 +123,7 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
             }))
           }
         } ~ put { entity(as[CreateEntityRequest]) { request =>
-            response(() => omen.createEntityForRequest(request))
+            response(() => omen.createEntity(request))
         }}
       }
     } ~ pathPrefix("tasks") {
@@ -158,33 +159,7 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
         getFromResource("html/tech.html") // uses implicit ContentTypeResolver
       } ~ pathEnd {
         get {
-          val mapping = omen.config.entities.zipWithIndex.map(e => e._1.id -> e._2).toMap
-          response(() => JsObject(
-            "entities" -> JsArray(
-              omen.config.entities.zipWithIndex.map(e => JsObject(
-                "id" -> JsNumber(e._2),
-                "label" -> JsString(e._1.id),
-              )).toVector
-            ),
-            "edges" -> JsArray(
-              omen.config.entities.flatMap(e => {
-                (
-                  e.own.map(req => req.map(own => JsObject(
-                    "type" -> JsString("owns"),
-                    "label" -> JsString("owns"),
-                    "from" -> JsNumber(mapping(e.id)),
-                    "to" -> JsNumber(mapping(own))
-                  ))).getOrElse(List()) ++ e.requirements.flatMap(req => req.entities.map(req => {
-                    req.map(r => JsObject(
-                      "label" -> JsString("requirement"),
-                      "type" -> JsString("requirement"),
-                      "from" -> JsNumber(mapping(e.id)),
-                      "to" -> JsNumber(mapping(r.id.replace("parent[", "").replace("]", "")))
-                    ))
-                  })).getOrElse(List())).toVector
-              }).toVector
-            )
-          ))
+          response(() => omen.config.toGraph)
         }
       }
     }

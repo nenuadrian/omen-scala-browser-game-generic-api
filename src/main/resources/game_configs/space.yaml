@@ -58,7 +58,7 @@ entities:
     tag: building
     upgradeable: true
     attributes:
-      - id: parent[crystal-hourly]
+      - id: parent[planet][crystal-hourly]
         formula: "[amount] *  10"
     requirements:
       attributes:

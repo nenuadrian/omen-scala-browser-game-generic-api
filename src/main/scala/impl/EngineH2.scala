@@ -105,11 +105,11 @@ class EngineH2(config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) =>
     }
   }
 
-  def createEntityForRequest(createEntityRequest: CreateEntityRequest): EntityCreationResponse = {
-    withDb { implicit conn => createEntity(createEntityRequest)(conn) }
+  def createEntity(createEntityRequest: CreateEntityRequest): EntityCreationResponse = {
+    withDb { implicit conn => createEntityInternal(createEntityRequest)(conn) }
   }
 
-  def createEntity(createEntityRequest: CreateEntityRequest)(implicit conn: Connection): EntityCreationResponse = {
+  private def createEntityInternal(createEntityRequest: CreateEntityRequest)(implicit conn: Connection): EntityCreationResponse = {
     logger.info("Creating new entity")
 
     val entityDescription = config.entityConfigById(createEntityRequest.id).get

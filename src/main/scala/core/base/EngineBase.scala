@@ -27,17 +27,20 @@ abstract class EngineBase(val config: EngineConfig, leaderboardAgent: (Entity, L
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
   val webRoutes = new Endpoints(this)
 
+  def createTask(entity_id: String, req: CreateTaskRequest): Task
+  def createEntity(createEntityRequest: CreateEntityRequest): EntityCreationResponse
+
+  def entityWithEntityId(id: String, playerId: Option[String] = None): Option[Entity]
+  def entitiesWithPlayerId(primaryParentEntityId: Option[String] = None, parent_entity_id: Option[String] = None): List[Entity]
+
   def ackTask(task: Task): Task
   def tasks(playerId: Option[String], parentEntityId: Option[String], acknowledged: Boolean): List[Task]
   def task(taskId: String): Option[Task]
-  def createTask(entity_id: String, req: CreateTaskRequest): Task
-  def createEntityForRequest(createEntityRequest: CreateEntityRequest): EntityCreationResponse
   def updateRefData(entity: Entity, ref_key: String, ref_value: String): RefData
   def upgradeEntity(entity: Entity, to: Int): Entity
   def updateAttributeRequest(entity: Entity, attribute: Attribute): Attribute
-  def entityWithEntityId(id: String, playerId: Option[String] = None): Option[Entity]
   def computeRequirements(entity: Entity, forAmount: Int): RequirementsResponse
-  def entitiesWithPlayerId(primaryParentEntityId: Option[String] = None, parent_entity_id: Option[String] = None): List[Entity]
+
   def leaderboard(forId: String): List[(String, List[(String, Int)])]
 }
 
