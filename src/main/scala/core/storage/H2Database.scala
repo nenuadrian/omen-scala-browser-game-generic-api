@@ -1,4 +1,4 @@
-package core
+package core.storage
 
 import org.apache.commons.dbcp2.BasicDataSource
 

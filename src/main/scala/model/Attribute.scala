@@ -1,6 +1,6 @@
 package model
 
-import core.TimeProvider
+import core.util.TimeProvider
 import spray.json._
 
 import java.sql.{Connection, ResultSet}

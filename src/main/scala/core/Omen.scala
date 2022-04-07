@@ -1,11 +1,12 @@
-package omen
+package core
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import core.{Engine, H2Database, OmenConfigValidator, TimeProvider}
+import core.impl.EngineH2
+import core.storage.H2Database
+import core.util.{OmenConfigValidator, TimeProvider}
 import model.Entity
-import org.apache.commons.dbcp2.BasicDataSource
 import org.apache.logging.log4j.scala.Logging
 
 import scala.util.Properties
@@ -25,28 +26,13 @@ object Omen extends App with Logging with H2Database {
     List(("main", entities.count(_.id == "planets")))
   }
 
-  val engine = new Engine(configsPath match {
+  val engine = new EngineH2(configsPath match {
     case Some(path) => OmenConfigValidator.parse(path)
     case _ => OmenConfigValidator.parse(ClassLoader
       .getSystemResourceAsStream("game_configs/space.yaml"))
   }, leaderboardAgent)(ds, new TimeProvider())
 
-  private val bindingFuture = Http().bindAndHandle(engine.webRoutes.route, "localhost", port)
-
+  private val bindingFuture = Http().bindAndHandle(engine.webRoutes.route, "0.0.0.0", port)
 
   logger.info(s"OMEN Engine is now ONLINE on port $port!")
-
-
-  private def mysql = {
-    val clientConnPool = new BasicDataSource()
-    val jdbcSettings = "?&autoReconnect=true&failOverReadOnly=false&maxReconnects=10"
-    val urlClient = "jdbc:mysql://localhost" + jdbcSettings
-    val driver = "com.mysql.jdbc.Driver"
-    clientConnPool.setDriverClassName(driver)
-    clientConnPool.setUrl(urlClient)
-    clientConnPool.setInitialSize(2)
-    clientConnPool.setUsername("root")
-    clientConnPool.setPassword("root")
-    clientConnPool
-  }
 }

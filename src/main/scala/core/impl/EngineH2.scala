@@ -1,5 +1,7 @@
-package core
+package core.impl
 
+import core.base.EngineBase
+import core.util.TimeProvider
 import model._
 import org.apache.commons.dbcp2.BasicDataSource
 import org.nfunk.jep.JEP
@@ -10,7 +12,7 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import scala.concurrent.duration.Duration
 
-class Engine(config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit db: BasicDataSource, timeProvider: TimeProvider)
+class EngineH2(config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit db: BasicDataSource, timeProvider: TimeProvider)
   extends EngineBase(config, leaderboardAgent, cronsEnabled)(db, timeProvider) {
 
   import model.AttributeProtocol._
@@ -356,7 +358,7 @@ class Engine(config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => L
 
 }
 
-object Engine {
+object EngineH2 {
   sealed trait DependencyTree
   case class Node(name: String) extends DependencyTree
 }

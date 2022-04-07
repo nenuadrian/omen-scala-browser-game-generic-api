@@ -1,7 +1,7 @@
 package model
 
 import com.github.t3hnar.bcrypt._
-import core.TimeProvider
+import core.util.TimeProvider
 import spray.json._
 
 import java.sql.{Connection, ResultSet}

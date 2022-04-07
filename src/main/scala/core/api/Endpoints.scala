@@ -1,11 +1,12 @@
-package api
+package core.api
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.server.{Directive1, Route, StandardRoute}
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import core.{Engine, EngineBase}
+import core.base.EngineBase
+import core.impl.EngineH2
 import model.JsonSupport._
 import model._
 import org.apache.logging.log4j.scala.Logging

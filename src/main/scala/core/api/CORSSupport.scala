@@ -1,4 +1,4 @@
-package api
+package core.api
 
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.StatusCodes

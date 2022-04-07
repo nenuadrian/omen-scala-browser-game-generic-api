@@ -1,6 +1,6 @@
 package utils
 
-import core.TimeProvider
+import core.util.TimeProvider
 
 class TestTimeProvider extends TimeProvider {
   var currentTimestampOverride: Option[Long] = None

@@ -1,6 +1,6 @@
 package model
 
-import core.TimeProvider
+import core.util.TimeProvider
 import model.EngineConfigUtils.preparedStatement2List
 import spray.json._
 

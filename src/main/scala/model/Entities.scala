@@ -1,7 +1,7 @@
 package model
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import core.TimeProvider
+import core.util.TimeProvider
 import net.jcazevedo.moultingyaml.DefaultYamlProtocol
 import org.apache.commons.dbcp2.BasicDataSource
 import spray.json._

@@ -1,16 +1,13 @@
-package core
+package core.util
 
-import model.{CustomYaml, EngineConfig}
-import net.jcazevedo.moultingyaml._
+import model.EngineConfig
 import org.apache.commons.io.IOUtils
-
+import net.jcazevedo.moultingyaml._
+import model.CustomYaml._
 import java.io.{FileInputStream, InputStream}
 import java.nio.charset.StandardCharsets
-import scala.language.implicitConversions
 
 object OmenConfigValidator {
-
-  import CustomYaml._
 
   def parse(configsPath: String): EngineConfig = {
     parse(new FileInputStream(configsPath))

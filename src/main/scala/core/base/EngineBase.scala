@@ -1,19 +1,14 @@
-package core
+package core.base
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import api.Endpoints
+import core.api.Endpoints
+import core.util.TimeProvider
 import model._
 import org.apache.commons.dbcp2.BasicDataSource
 import org.apache.logging.log4j.scala.Logging
-import org.nfunk.jep.JEP
-import spray.json.JsNull
 
-import java.sql.Connection
-import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 import scala.concurrent.ExecutionContextExecutor
-import scala.concurrent.duration.Duration
 
 abstract class EngineBase(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit db: BasicDataSource, timeProvider: TimeProvider) extends Logging {
   logger.info("""
