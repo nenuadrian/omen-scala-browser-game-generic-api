@@ -30,6 +30,8 @@ case class Task(task_id: String, entity_id: String, duration: Int, endTimestamp:
     statement.execute()
     this
   }
+
+  def ack(ack: Boolean = true): Task = this.copy(acknowledged = ack)
 }
 
 object TaskModel {

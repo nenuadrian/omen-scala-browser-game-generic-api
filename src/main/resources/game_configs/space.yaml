@@ -73,8 +73,6 @@ entities:
       attributes:
         - id: parent[crystal]
           formula: "100 * [amount] + 100"
-        - id: parent[metal]
-          formula: "100 * [amount] + 100"
       entities:
         - id: parent[metal-mine]
           formula: "1 * [amount] + 1"

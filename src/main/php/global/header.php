@@ -33,8 +33,8 @@ function POST($url, $data = []) {
     $response = $response->send();
     $apiCalls++;
     $data = json_decode(json_encode($response->body), true);
-    if (!isset($data['data'])) {
-        throw new Exception("Undefined data: " . $response->body);
+    if ($data['status'] != 200 && !isset($data['data'])) {
+        throw new Exception("Undefined data: " . var_export($response->body));
     }
     return $data['data'];
 }
@@ -80,21 +80,6 @@ function render_header() {
                         <li class="nav-item active">
                             <a class="nav-link" href="map.php">Map</a>
                         </li>
-                        <?php if (isset($_GET['planet'])): ?>
-                            <li class="nav-item active">
-                                <a class="nav-link" href="planet.php?planet=<?=$_GET['planet']?>">Overview</a>
-                            </li>
-                            <li class="nav-item active">
-                                <a class="nav-link" href="planet.php?for=building&planet=<?=$_GET['planet']?>">Buildings</a>
-                            </li>
-                            <li class="nav-item active">
-                                <a class="nav-link" href="planet.php?for=research&planet=<?=$_GET['planet']?>">Research</a>
-                            </li>
-                            <li class="nav-item active">
-                                <a class="nav-link" href="planet.php?for=ship&planet=<?=$_GET['planet']?>">Ships</a>
-                            </li>
-
-                        <?php endif; ?>
                         <li class="nav-item active">
                             <a class="nav-link" href="tech.php">Tech</a>
                         </li>
@@ -109,9 +94,36 @@ function render_header() {
                             <a class="nav-link" href="leaderboard.php?for=organizations">Org Leaderboard</a>
                         </li>
                     </ul>
-                    <a class="btn btn-outline-warning my-2 my-sm-0" href="logout.php">logout</a>
+                    <a class="btn btn-outline-warning my-2 my-sm-0" href="logout.php">X</a>
                 </div>
             </nav>
+            <?php if (isset($_GET['planet'])): ?>
+            <br/>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="planet.php?planet=<?=$_GET['planet']?>">Overview</a>
+                                    </li>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="planet.php?for=building&planet=<?=$_GET['planet']?>">Buildings</a>
+                                    </li>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="planet.php?for=research&planet=<?=$_GET['planet']?>">Research</a>
+                                    </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <br/>
             <?php endif; ?>
@@ -165,7 +177,7 @@ function renderRefData($entity_id, $refData) {
                             <?=$att['ref_key']?>
                         </div>
                         <div class="col-md-6">
-                            <input type="text" value="<?=$att['ref_value']?>" class="form-control" name="value"/>
+                            <input type="text" value="<?=urldecode($att['ref_value'])?>" class="form-control" name="value"/>
                             <input type="hidden" value="<?=$entity_id?>" class="form-control" name="entity_id"/>
                         </div>
                         <div class="col-md-3">
@@ -208,7 +220,7 @@ if (isset($_SESSION['entity_id'])) {
         }
 
         if (isset($_POST['refKey'])) {
-            $response = POST('entities/' . $_POST['entity_id'] . '/ref/' . $_POST['refKey'] . '/' . $_POST['value'] . '?');
+            $response = POST('entities/' . $_POST['entity_id'] . '/ref/' . $_POST['refKey'] . '/' . urlencode($_POST['value']) . '?');
             header('Location: ' . $_SERVER['REQUEST_URI']);
             die();
         }

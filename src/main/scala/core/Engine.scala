@@ -1,27 +1,17 @@
 package core
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.stream.ActorMaterializer
-import api.Endpoints
-import core.Engine.{DependencyTree, Node}
 import model._
-import omen.Omen.logger
 import org.apache.commons.dbcp2.BasicDataSource
-import org.apache.logging.log4j.scala.Logging
 import org.nfunk.jep.JEP
-import scalax.collection.Graph
-import scalax.collection.GraphEdge.HyperEdge
-import scalax.collection.GraphPredef.{InnerNodeParam, NodeParam, Param}
 import spray.json.JsNull
 
 import java.sql.Connection
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
-import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.Duration
 
-class Engine(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit db: BasicDataSource, timeProvider: TimeProvider) extends Logging {
+class Engine(config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit db: BasicDataSource, timeProvider: TimeProvider)
+  extends EngineBase(config, leaderboardAgent, cronsEnabled)(db, timeProvider) {
 
   import model.AttributeProtocol._
   import model.EngineConfigUtils._
@@ -29,26 +19,10 @@ class Engine(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) 
   import model.RefDataProtocol._
   import model.TaskProtocol._
 
-  logger.info("""
-                | _______  __   __  _______  __    _
-                ||       ||  |_|  ||       ||  |  | |
-                ||   _   ||       ||    ___||   |_| |
-                ||  | |  ||       ||   |___ |       |
-                ||  |_|  ||       ||    ___||  _    |
-                ||       || ||_|| ||   |___ | | |   |
-                ||_______||_|   |_||_______||_|  |__|""".stripMargin)
-
-  logger.info(s"${config.entities.size} entities configured")
-
-  implicit val system: ActorSystem = ActorSystem("omen-as")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-  val webRoutes = new Endpoints(this)
-
   private val scheduler = system.scheduler
   private val hourlyAttributes: Seq[(EntityConfig, AttributeConfig)] = config.entities.filter(_.have.isDefined).flatMap(e => e.have.get.filter(_.hourly_rate_attribute.isDefined).map(h => e -> h))
   private val tasksTask = new Runnable {
-    def run(): Unit = executeTasksTask
+    def run(): Unit = executeTasksTask()
   }
   private val hourlyRateTask = new Runnable {
     def run(): Unit = executeHourlyRateUpdate()
@@ -95,12 +69,9 @@ class Engine(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) 
       runnable = hourlyRateTask)
   }
 
-  def ackTask(task: Task) = {
-    withDb { implicit conn =>
-      task.copy(acknowledged = true).save()
-    }
+  def ackTask(task: Task): Task = {
+    withDb { implicit conn => task.ack().save() }
   }
-
 
   def tasks(playerId: Option[String], parentEntityId: Option[String], acknowledged: Boolean): List[Task] = {
     withDb { conn => TaskModel.tasksWithPlayerId(conn, playerId, parentEntityId, acknowledged) }
@@ -123,17 +94,13 @@ class Engine(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) 
   }
 
 
-  def createTask(entity_id: String, req: CreateTaskRequest) = {
+  def createTask(entity_id: String, req: CreateTaskRequest): Task = {
     withDb { implicit conn =>
       val task = Task(java.util.UUID.randomUUID.toString, entity_id, req.duration,
         timeProvider.currentTimestamp + 1000 * req.duration, acknowledged = false, finished = false, data = req.data.getOrElse(JsNull))
       task.put()
       task
     }
-  }
-
-  def createPlayer(): EntityCreationResponse = {
-    withDb { implicit conn => createEntity(CreateEntityRequest("players", None, None)) }
   }
 
   def createEntityForRequest(createEntityRequest: CreateEntityRequest): EntityCreationResponse = {
@@ -231,7 +198,7 @@ class Engine(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) 
     }
   }
 
-  def extractEntitiesFromRs(entities: List[Entity])(implicit conn: Connection) = {
+  def extractEntitiesFromRs(entities: List[Entity])(implicit conn: Connection): List[Entity] = {
     val allAttributes = attributesForEntities(entities.map(_.entity_id))
     val allRefData = refdataForEntities(entities.map(_.entity_id))
     entities.map(entity => {
@@ -354,7 +321,7 @@ class Engine(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) 
     }
   }
 
-  private def createEntity(createEntityRequest: CreateEntityRequest, entityDescription: EntityConfig)(implicit conn: Connection) = {
+  protected def createEntity(createEntityRequest: CreateEntityRequest, entityDescription: EntityConfig)(implicit conn: Connection): Entity = {
     logger.info(s"Insert new entity ${entityDescription.id}")
 
     val entity = {

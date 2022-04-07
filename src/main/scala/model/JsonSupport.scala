@@ -1,8 +1,6 @@
 package model
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import api.{EntitiesQuery, RefDataQuery}
-import model.JsonSupport.{jsonFormat2, jsonFormat3, jsonFormat4, jsonFormat7}
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 object JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {

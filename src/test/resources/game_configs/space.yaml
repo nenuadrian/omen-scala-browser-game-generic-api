@@ -4,12 +4,15 @@ entities:
   - id: players
     own:
       - planets
+      - organizations
     have:
       - id: dark_matter
         default: 10
-      - id: dark_matter2
+      - id: dark_matter3
         default: 101
-
+  - id: organizations
+    own:
+      - planets
   - id: planets
     tag: planet
     own:

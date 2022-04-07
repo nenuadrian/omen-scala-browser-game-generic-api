@@ -8,6 +8,15 @@ The engine is capable of validating your config, providing visualisations of the
 
 The system is pretty much an entity management system, where relationships can be defined between them, and formulas uses to derive attributes based on this hierarchy.
 
+## Recommended usage pattern
+
+Have a database of your own, separate of that of the engine. Leverage the engine API for things like storing entities with relationships that have formulas between them (e.g. a building needing other things the player has such as abilities to be certain levels).
+
+Use Omen to create an entity for societies/organizations/guilds and even to store their main attributes, especially game element ones that you may want in future to use in other relationships (e.g. maybe societies can own a building).
+
+Leverage your own database of extra information storage, for example additional metadata about a player. Or for example if you want players to apply to join a society. Tell Omen to add a player to a society only when the application is approved.
+
+
 ## Sample YAML game definition
 
 [Click here for sample from the codebase](./src/main/resources/game_configs/space.yaml)

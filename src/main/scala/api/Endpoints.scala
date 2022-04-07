@@ -5,7 +5,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.server.{Directive1, Route, StandardRoute}
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import core.Engine
+import core.{Engine, EngineBase}
 import model.JsonSupport._
 import model._
 import org.apache.logging.log4j.scala.Logging
@@ -15,11 +15,7 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-case class RefDataQuery(key: String, value: String)
-case class EntitiesQuery(byIdentifier: Option[String] = None, refDataFilters: Option[List[RefDataQuery]] = None,
-                         parent_entity_id: Option[String] = None, tag: Option[String] = None, primaryParentEntityId: Option[String] = None)
-
-class Endpoints(omen: Engine)(implicit system: ActorSystem, materializer: ActorMaterializer,
+class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: ActorMaterializer,
                               executionContext: ExecutionContextExecutor)
   extends Logging with CORSSupport with SprayJsonSupport with DefaultJsonProtocol {
   implicit val timeout: Timeout = Timeout(10000 seconds)
@@ -49,11 +45,9 @@ class Endpoints(omen: Engine)(implicit system: ActorSystem, materializer: ActorM
       response(() => true)
     } ~ path("configuration") {
       response(() => omen.config)
-    } ~ pathPrefix("public") {
-      path("player") {
-        put {
-          response(() => omen.createPlayer())
-        }
+    } ~ path("player") {
+      put {
+        response(() => omen.createEntityForRequest(CreateEntityRequest("players", None, None)))
       }
     } ~ pathPrefix("entities") {
         parameter("primaryParentEntityId" ?) { primaryParentEntityId => {
@@ -111,8 +105,11 @@ class Endpoints(omen: Engine)(implicit system: ActorSystem, materializer: ActorM
               }
               case _ => pathEnd { complete(JsObject("status" -> JsNumber(404))) }
             }
-      }}}} ~ pathEnd {
-        post {
+       }} ~ get {
+          response(() => omen.entitiesWithPlayerId(primaryParentEntityId))
+        }
+       }} ~ pathEnd {
+         post {
           entity(as[EntitiesQuery]) { query =>
             response(() => omen.entitiesWithPlayerId(query.primaryParentEntityId, query.parent_entity_id)
               .filter(e => query.tag match {

@@ -12,8 +12,8 @@ class SpaceGameTest extends TestBed("space") {
   private def r[T](implicit reader : spray.json.JsonReader[T]) =
     responseAs[JsObject].fields("data").convertTo[T]
     
-  private def createPlayer(checks: (EntityCreationResponse, Entity) => Unit) {
-    Put("/public/player") ~> engine.webRoutes.route ~> check {
+  private def createPlayer(checks: (EntityCreationResponse, Entity) => Unit): Unit = {
+    Put("/player") ~> engine.webRoutes.route ~> check {
       val player = r[EntityCreationResponse]
       Get(s"/entities?primaryParentEntityId=${player.entity_id}") ~> engine.webRoutes.route ~> check {
         val playerEntity = r[List[Entity]]
@@ -35,7 +35,6 @@ class SpaceGameTest extends TestBed("space") {
       createPlayer((_, pe) => {
         pe.entity_id should not be empty
         pe.attributes.find(_.attr == "dark_matter").flatMap(_.value) should be(Some("10"))
-        pe.attributes.find(_.attr == "dark_matter2").flatMap(_.value) should be(Some("101"))
       })
     }
 
@@ -56,7 +55,7 @@ class SpaceGameTest extends TestBed("space") {
                 val response = r[Seq[Entity]]
                 response.size shouldEqual 11
                 response.last.amount shouldEqual 1
-                Get(s"/entities?parent_entity_id=${planetResponse.entity_id}&playerId=${player.entity_id}") ~> engine.webRoutes.route ~> check {
+                Post(s"/entities", EntitiesQuery(parent_entity_id = Some(planetResponse.entity_id), primaryParentEntityId = Some(player.entity_id))) ~> engine.webRoutes.route ~> check {
                   val responseWithParentFilter = r[Seq[Entity]]
                   responseWithParentFilter.size shouldEqual 9
                   Put(s"/entities?primaryParentEntityId=${player.entity_id}", CreateEntityRequest("small-fighter", Some(planetResponse.entity_id), Some(player.entity_id))) ~> engine.webRoutes.route ~> check {
@@ -189,7 +188,7 @@ class SpaceGameTest extends TestBed("space") {
               metalMine.amount shouldBe 0
               Post(s"/entities/${metalMine.entity_id}/requirements") ~> engine.webRoutes.route ~> check {
                 Post(s"/entities/${metalMine.entity_id}/upgrade/2") ~> engine.webRoutes.route ~> check {
-                  Get(s"/entities?parent_entity_id=${planetEntity.entity_id}") ~> engine.webRoutes.route ~> check {
+                  Post(s"/entities", EntitiesQuery(parent_entity_id = Some(planetEntity.entity_id))) ~> engine.webRoutes.route ~> check {
                     val metalMine2 = r[List[Entity]].filter(_.id == "metal-mine").head
                     metalMine2.amount shouldBe 1
                     Get(s"/entities/${planetEntity.entity_id}") ~> engine.webRoutes.route ~> check {
