@@ -1,7 +1,7 @@
 <?php require 'global/header.php'; 
 
 if ($_POST) {
-    $response = PUT('public/player');
+    $response = PUT('player');
     $_SESSION['entity_id'] = $response['entity_id'];
 } 
 

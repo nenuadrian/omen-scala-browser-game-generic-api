@@ -48,9 +48,9 @@ All responses are in this JSON format:
 |----------------------------------------------|--------|------------------------------------------------|-----------------------------------------------------|
 | ping                                         | GET    |                                                | Check status of server                              |
 | configuration                                | GET    |                                                | JSON version of the YAML configuration              |
-| public/player                                | PUT    |                                                | JSON version of the YAML configuration              |
+| player                                       | PUT    | Create new player entity                       | JSON version of the YAML configuration              |
 | entities                                     | POST   |                                                | Find entities via a EntitiesQuery                   |
-| entities                                     | PUT    |                                                | Create Entity                                       |
+| entities                                     | PUT    | Create new entity                              | Create Entity                                       |
 | entities/{entityId}                          | GET    | primaryParentEntityId?                         | Get entity info                                     |
 | entities/{entityId}/upgrade                  | POST   | primaryParentEntityId?                         | Upgrade entity level                                |
 | entities/{entityId}/ref/{key}/{value}        | POST   | primaryParentEntityId?                         | Update entity ref data                              |
@@ -59,7 +59,7 @@ All responses are in this JSON format:
 | entities/{entityId}/requirements             | POST   | primaryParentEntityId? / amount?               | Apply attributes of fulfilled requirements          |
 | tasks                                        | PUT    |                                                | Create Tasks                                        |
 | tasks                                        | GET    |                                                | Create Task                                         |
-| tasks/{taskId}/ack                           | POST   |                                                | Acknowledge task completion                         |
+| tasks/{taskId}                               | POST   | Acknowledge task                               | Acknowledge task completion                         |
 | leaderboard                                  | GET    | id                                             | Get leaderboard by a specific type                  |
 | tech-tree                                    | GET    | player_id? / parent_entity_id? / acknowledged? | Tries to generate a graph from the config           |
 

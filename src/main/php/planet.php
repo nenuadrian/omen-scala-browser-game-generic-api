@@ -26,7 +26,7 @@ foreach($tasks as $task) {
         $entity = GET('entities/' . $entity_id);
         
         POST('entities/' . $entity_id . '/upgrade/' . ($entity['amount'] + 1));
-        POST('tasks/' . $task['task_id'] . '/ack');
+        POST('tasks/' . $task['task_id']);
     }
 }
 
