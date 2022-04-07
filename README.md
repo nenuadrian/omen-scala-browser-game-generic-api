@@ -66,6 +66,6 @@ There are tests for most of the functionality, mocking the entire database and s
   
 ## Visualize the tech-tree and game config
 
-An HTML endpoint is available which renders a visualisation of the entire config by using the http://localhost:8083/tech-tree endpoint at http://localhost:8083/tech-tree/html
+An HTML endpoint is available which renders a visualisation of the entire config by using the `localhost:8083/tech-tree` endpoint at `localhost:8083/tech-tree/html`
 
 ![tech](docs/diagram-tech-tree.png)
