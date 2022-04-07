@@ -9,7 +9,7 @@ trait H2Database {
   protected def generateDataSource: BasicDataSource = {
     val clientConnPool = new BasicDataSource()
     clientConnPool.setDriverClassName("org.h2.Driver")
-    clientConnPool.setUrl("jdbc:h2:~/test2")
+    clientConnPool.setUrl("jdbc:h2:~/test" + Random.nextInt())
     clientConnPool.setInitialSize(2)
     clientConnPool.setUsername("sa")
     clientConnPool.setPassword("")

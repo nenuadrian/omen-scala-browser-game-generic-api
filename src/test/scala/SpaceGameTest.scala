@@ -9,10 +9,10 @@ class SpaceGameTest extends TestBed("space") {
   import model.PlayerProtocol._
   import model.TaskProtocol._
 
-  def r[T](implicit reader : spray.json.JsonReader[T]) =
+  private def r[T](implicit reader : spray.json.JsonReader[T]) =
     responseAs[JsObject].fields("data").convertTo[T]
     
-  def createPlayer(checks: (EntityCreationResponse, Entity) => Unit) {
+  private def createPlayer(checks: (EntityCreationResponse, Entity) => Unit) {
     Put("/public/player") ~> engine.webRoutes.route ~> check {
       val player = r[EntityCreationResponse]
       Get(s"/entities?primaryParentEntityId=${player.entity_id}") ~> engine.webRoutes.route ~> check {

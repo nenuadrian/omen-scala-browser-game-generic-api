@@ -23,7 +23,21 @@ $( document ).ready(function() {
               nodes: nodes,
               edges: edges,
             };
-            var options = {};
+            var options = {
+                layout: {
+                    hierarchical: {
+                        enabled: true,
+                        sortMethod: "directed"
+                    }
+                },
+                edges: {
+                    arrows: {
+                        to: {
+                            enabled: true
+                        }
+                    }
+                }
+            };
             var network = new vis.Network(container, data, options);
       })
       .fail(function() {

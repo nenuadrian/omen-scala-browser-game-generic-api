@@ -4,12 +4,15 @@ entities:
   - id: players
     own:
       - planets
+      - organizations
     have:
       - id: dark_matter
         default: 10
       - id: dark_matter3
         default: 101
   - id: organizations
+    own:
+      - planets
   - id: planets
     tag: planet
     own:
@@ -69,6 +72,8 @@ entities:
     requirements:
       attributes:
         - id: parent[crystal]
+          formula: "100 * [amount] + 100"
+        - id: parent[metal]
           formula: "100 * [amount] + 100"
       entities:
         - id: parent[metal-mine]
