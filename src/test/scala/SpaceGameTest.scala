@@ -79,7 +79,6 @@ class SpaceGameTest extends TestBed("space") {
         Put(s"/entities", CreateEntityRequest("planets", Some(pe.entity_id), Some(player.entity_id))) ~> engine.webRoutes.route ~> check {
           val planetResponse = r[EntityCreationResponse]
           Post(s"/entities/${planetResponse.entity_id}/ref/test-k/test-v?playerId=${player.entity_id}") ~> engine.webRoutes.route ~> check {
-            //val response = r[String]
             Get(s"/entities/${planetResponse.entity_id}") ~> engine.webRoutes.route ~> check {
               val response = r[Entity]
               response.refData.toSet shouldEqual Set(RefData(planetResponse.entity_id, "test-k", "test-v"))

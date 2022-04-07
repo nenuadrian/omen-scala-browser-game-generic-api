@@ -3,18 +3,28 @@ package core
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import core.base.EngineBase
+import core.base.{EngineBase, StorageEngine}
+import core.impl.Engine
 import core.util.{OmenConfigValidator, TimeProvider}
-import impl.EngineH2
-import model.Entity
+import model.{EngineConfig, Entity}
+import org.apache.commons.dbcp2.BasicDataSource
 import org.apache.logging.log4j.scala.Logging
-import storage.H2Database
 
 import scala.util.Properties
 
 trait Omen extends Logging {
   def leaderboardAgent(player: Entity, entities: List[Entity]): List[(String, Int)]
-  def engine: EngineBase
+  protected def storageEngine(config: EngineConfig): StorageEngine
+
+  private def engine: EngineBase = {
+    val configsPath = Properties.envOrNone("config_path")
+    val config = configsPath match {
+      case Some(path) => OmenConfigValidator.parse(path)
+      case _ => OmenConfigValidator.parse(ClassLoader
+        .getSystemResourceAsStream("game_configs/space.yaml"))
+    }
+    new Engine(config, leaderboardAgent)(storageEngine(config), new TimeProvider())
+  }
 
   def start(): Unit = {
     val port = Properties.envOrElse("PORT", 8083.toString).toInt

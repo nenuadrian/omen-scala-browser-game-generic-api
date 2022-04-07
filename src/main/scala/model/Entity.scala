@@ -1,12 +1,13 @@
 package model
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import core.base.StorageEngine
 import core.util.TimeProvider
-import model.EngineConfigUtils.preparedStatement2List
 import spray.json._
 
 import java.sql.{Connection, ResultSet}
 import java.util.UUID.randomUUID
+import scala.language.implicitConversions
 
 case class CreateEntityRequest(id: String, entity_parent: Option[String], entity_primary_parent: Option[String])
 
@@ -37,17 +38,16 @@ case class Entity(entity_id: String = randomUUID.toString, id: String, attribute
     this
   }
 
-  def attributes()(implicit conn: Connection): List[Attribute] = {
-    val statement = conn.prepareStatement(s"SELECT * FROM `attributes` WHERE entity_id = ?")
-    statement.setString(1, entity_id)
-    preparedStatement2List(statement)
+  def attributes()(implicit store: StorageEngine): List[Attribute] = {
+    store.attributesForEntities(List(entity_id)).values.headOption.getOrElse(List())
   }
 
-  def updateAttribute(attribute: Attribute)(implicit conn: Connection, timeProvider: TimeProvider): Attribute = {
+  def updateAttribute(attribute: Attribute)(implicit store: StorageEngine, timeProvider: TimeProvider): Attribute = {
     attributes().find(_.attr == attribute.attr) match {
-      case Some(_) => attribute.save()
-      case _ => attribute.put()
+      case Some(_) => store.save(attribute)
+      case _ => store.put(attribute)
     }
+    attribute
   }
 
 }

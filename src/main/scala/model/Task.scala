@@ -1,7 +1,6 @@
 package model
 
 import core.util.TimeProvider
-import model.EngineConfigUtils.preparedStatement2List
 import spray.json._
 
 import java.sql.{Connection, ResultSet}
@@ -34,29 +33,6 @@ case class Task(task_id: String, entity_id: String, duration: Int, endTimestamp:
   def ack(ack: Boolean = true): Task = this.copy(acknowledged = ack)
 }
 
-object TaskModel {
-
-  import model.TaskProtocol._
-
-  def tasksWithPlayerId(conn: Connection, playerId: Option[String], entityId: Option[String], acknowledged: Boolean = false): List[Task] = {
-    val statement = (playerId, entityId) match {
-      case (Some(id), None) => {
-        val statement = conn.prepareStatement(s"SELECT * FROM `task` WHERE entity_id IN (select entity_id from entities where player_id = ?) and acknowledged = ?")
-        statement.setString(1, id)
-        statement
-      }
-      case (None, Some(id)) => {
-        val statement = conn.prepareStatement(s"SELECT * FROM `task` WHERE entity_id = ? and acknowledged = ?")
-        statement.setString(1, id)
-        statement
-      }
-      case _ => throw new UnsupportedOperationException
-    }
-    statement.setInt(2, if (acknowledged) 1 else 0)
-    preparedStatement2List(statement)
-  }
-
-}
 
 object TaskProtocol extends DefaultJsonProtocol {
   implicit val taskFormat: RootJsonFormat[Task] = jsonFormat7(Task)

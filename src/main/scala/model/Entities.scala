@@ -71,31 +71,3 @@ trait DBEntity[T] {
   def put()(implicit conn: Connection, timeProvider: TimeProvider): T
 }
 
-
-object EngineConfigUtils {
-  implicit def preparedStatement2List[T](statement: PreparedStatement)(implicit rs2t: ResultSet => T): List[T] = {
-    val rs = statement.executeQuery
-    var attributes: List[T] = List()
-    while (rs.next()) {
-      val attr: T = rs
-      attributes = attributes :+ attr
-    }
-    attributes
-  }
-
-  implicit def preparedStatement2Entity[T](statement: PreparedStatement)(implicit rs2t: ResultSet => T): Option[T] = {
-    val rs = statement.executeQuery
-    if (rs.next()) {
-      Some(rs)
-    } else None
-  }
-
-  def withDb[T](method: Connection => T)(implicit db: BasicDataSource): T = {
-    val conn = db.getConnection
-    try {
-      method(conn)
-    } finally {
-      conn.close()
-    }
-  }
-}

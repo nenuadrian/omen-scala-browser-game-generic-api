@@ -2,14 +2,14 @@ package storage
 
 import core.base.StorageEngine
 import core.util.TimeProvider
-import model.{Attribute, DBEntity, EngineConfig, Entity, RefData, Task}
+import model._
 import org.apache.commons.dbcp2.BasicDataSource
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
 import java.util.Date
-import scala.util.{Properties, Random}
+import scala.util.Properties
 
-class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) extends StorageEngine {
+class NoSQLDatabase(implicit timeProvider: TimeProvider, config: EngineConfig) extends StorageEngine {
   import model.AttributeProtocol._
   import model.EntityProtocol._
   import model.RefDataProtocol._
@@ -24,9 +24,6 @@ class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) exte
     clientConnPool.setPassword("")
     clientConnPool
   }
-
-  protected val db = generateDataSource
-  refresh(db)
 
   def refresh(clientConnPool: BasicDataSource): Unit = {
     val conn = clientConnPool.getConnection
@@ -44,6 +41,9 @@ class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) exte
     creates.foreach(c => conn.prepareStatement(c).execute())
     conn.close()
   }
+
+  protected val db = generateDataSource
+  refresh(db)
 
   def withDb[T](method: Connection => T): T = {
     val conn = db.getConnection
@@ -100,6 +100,7 @@ class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) exte
     }
   }
 
+
   def extractEntitiesFromRs(entities: List[Entity])(implicit conn: Connection): List[Entity] = {
     val allAttributes = attributesForEntities(entities.map(_.entity_id))
     val allRefData = refdataForEntities(entities.map(_.entity_id))
@@ -113,6 +114,7 @@ class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) exte
         refData = allRefData.getOrElse(entity.entity_id, List()))
     })
   }
+
 
   implicit def preparedStatement2List[T](statement: PreparedStatement)(implicit rs2t: ResultSet => T): List[T] = {
     val rs = statement.executeQuery

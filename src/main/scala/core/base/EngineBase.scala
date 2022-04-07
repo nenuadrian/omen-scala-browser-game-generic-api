@@ -10,7 +10,7 @@ import org.apache.logging.log4j.scala.Logging
 
 import scala.concurrent.ExecutionContextExecutor
 
-abstract class EngineBase(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit db: BasicDataSource, timeProvider: TimeProvider) extends Logging {
+abstract class EngineBase(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit storageEngine: StorageEngine, timeProvider: TimeProvider) extends Logging {
   logger.info("""
                 | _______  __   __  _______  __    _
                 ||       ||  |_|  ||       ||  |  | |
