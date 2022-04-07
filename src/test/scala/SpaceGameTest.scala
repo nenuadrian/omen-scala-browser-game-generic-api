@@ -6,7 +6,6 @@ import spray.json._
 class SpaceGameTest extends TestBed("space") {
 
   import model.EntityProtocol._
-  import model.PlayerProtocol._
   import model.TaskProtocol._
 
   private def r[T](implicit reader : spray.json.JsonReader[T]) =

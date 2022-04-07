@@ -23,7 +23,6 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
 
   import model.AttributeProtocol._
   import model.EntityProtocol._
-  import model.PlayerProtocol._
   import model.RefDataProtocol._
   import model.TaskProtocol._
 

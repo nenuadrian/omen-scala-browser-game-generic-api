@@ -1,12 +1,7 @@
 package model
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import core.util.TimeProvider
-import net.jcazevedo.moultingyaml.DefaultYamlProtocol
-import org.apache.commons.dbcp2.BasicDataSource
 import spray.json._
 
-import java.sql.{Connection, PreparedStatement, ResultSet}
 import scala.language.implicitConversions
 
 
@@ -65,9 +60,5 @@ case class EntityConfig(id: String,
 case class AttributeConfig(id: String, default: Option[Int], max: Option[Int], formula: Option[String],
                            hourly_rate_attribute: Option[String])
 
-trait DBEntity[T] {
-  def save()(implicit conn: Connection): T
 
-  def put()(implicit conn: Connection, timeProvider: TimeProvider): T
-}
 

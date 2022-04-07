@@ -2,18 +2,38 @@ package storage
 
 import core.base.StorageEngine
 import core.util.TimeProvider
-import model.{Attribute, DBEntity, EngineConfig, Entity, RefData, Task}
+import model.{Attribute, EngineConfig, Entity, RefData, Task}
 import org.apache.commons.dbcp2.BasicDataSource
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
 import java.util.Date
+import scala.language.implicitConversions
 import scala.util.{Properties, Random}
+import spray.json._
 
 class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) extends StorageEngine {
-  import model.AttributeProtocol._
-  import model.EntityProtocol._
-  import model.RefDataProtocol._
   import model.TaskProtocol._
+
+  private implicit def rs2Attribute(rs: ResultSet): Attribute =
+    Attribute(rs.getString("name"), rs.getString("entity_id"), Some(rs.getString("value")),
+      rs.getLong("last_hourly_timestamp"))
+
+
+  private implicit def rs2Entity(rs: ResultSet): Entity =
+    Entity(rs.getString("entity_id"), rs.getString("id"),
+      List(), List(), Option(rs.getString("primary_parent_entity_id")),
+      Option(rs.getString("parent_entity_id")), rs.getInt("amount"))
+
+
+  private implicit def rs2refData(rs: ResultSet): RefData =
+    RefData(rs.getString("entity_id"), rs.getString("ref_key"), rs.getString("ref_value"))
+
+
+  private implicit def rs2task(rs: ResultSet): Task =
+    Task(rs.getString("task_id"), rs.getString("entity_id"), rs.getInt("duration"),
+      rs.getLong("end_timestamp"),
+      acknowledged = rs.getString("acknowledged") == "1", finished = rs.getString("finished") == "1",
+      data = rs.getString("data").parseJson)
 
   protected def generateDataSource: BasicDataSource = {
     val clientConnPool = new BasicDataSource()
@@ -25,7 +45,7 @@ class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) exte
     clientConnPool
   }
 
-  protected val db = generateDataSource
+  protected val db: BasicDataSource = generateDataSource
   refresh(db)
 
   def refresh(clientConnPool: BasicDataSource): Unit = {
@@ -82,15 +102,84 @@ class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) exte
     }
   }
 
-  override def save[T <: DBEntity[T]](e: T): T = {
+  override def save[T](e: T): T = {
     withDb { implicit conn =>
-      e.save()
+      e match {
+        case e: Attribute => {
+          val statement = conn.prepareStatement(s"update attributes set value = ?, last_hourly_timestamp = ? where entity_id = ? and name = ?")
+          statement.setString(1, e.value.getOrElse(0).toString)
+          statement.setLong(2, e.lastHourlyTimestamp)
+          statement.setString(3, e.entity_id)
+          statement.setString(4, e.attr)
+          statement.executeUpdate()
+        }
+        case e: Entity => {
+            val statement = conn.prepareStatement(s"update `entities` set amount = ? WHERE entity_id = ?")
+            statement.setInt(1, e.amount)
+            statement.setString(2, e.entity_id)
+            statement.execute()
+        }
+        case e: RefData => {
+            val statement = conn.prepareStatement(s"update entity_ref_data set ref_value = ? where entity_id = ? and ref_key = ?")
+            statement.setString(2, e.entity_id)
+            statement.setString(3, e.ref_key)
+            statement.setString(1, e.ref_value)
+            statement.executeUpdate()
+
+        }
+        case e: Task => {
+            val statement = conn.prepareStatement(s"update task set acknowledged = ?, data = ? where task_id = ?")
+            statement.setInt(1, if (e.acknowledged) 1 else 0)
+            statement.setString(2, e.data.compactPrint)
+            statement.setString(3, e.task_id)
+            statement.execute()
+        }
+        case _ => throw new UnsupportedOperationException
+      }
     }
+
+    e
   }
-  override def put[T <: DBEntity[T]](e: T): T = {
+  override def put[T](e: T): T = {
     withDb { implicit conn =>
-      e.put()
+      e match {
+        case e: Attribute => {
+          val statement = conn.prepareStatement(s"insert into attributes (entity_id, name, value, last_hourly_timestamp) values(?, ?, ?, ?)")
+          statement.setString(1, e.entity_id)
+          statement.setString(2, e.attr)
+          statement.setString(3, e.value.getOrElse(0).toString)
+          statement.setLong(4, timeProvider.currentTimestamp)
+          statement.executeUpdate()
+        }
+        case e: Entity => {
+            val statement = conn.prepareStatement(s"insert into entities (entity_id, id, primary_parent_entity_id, parent_entity_id, amount) values(?, ?, ?, ?, ?)")
+            statement.setString(1, e.entity_id)
+            statement.setString(2, e.id)
+            statement.setString(3, e.primary_parent_entity_id.orNull)
+            statement.setString(4, e.parent_entity_id.orNull)
+            statement.setInt(5, e.amount)
+            statement.execute()
+        }
+        case e: RefData => {
+          val statement = conn.prepareStatement(s"insert into entity_ref_data (entity_id, ref_key, ref_value) values(?, ?, ?)")
+          statement.setString(1, e.entity_id)
+          statement.setString(2, e.ref_key)
+          statement.setString(3, e.ref_value)
+          statement.executeUpdate()
+        }
+        case e: Task => {
+            val statement = conn.prepareStatement(s"insert into task (task_id, entity_id, duration, end_timestamp, data) values(?, ?, ?, ?, ?)")
+            statement.setString(1, e.task_id)
+            statement.setString(2, e.entity_id)
+            statement.setInt(3, e.duration)
+            statement.setLong(4, e.endTimestamp)
+            statement.setString(5, e.data.compactPrint)
+            statement.execute()
+        }
+        case _ => throw new UnsupportedOperationException
+      }
     }
+    e
   }
 
   override def entities(ids: List[String]): List[Entity] = {
