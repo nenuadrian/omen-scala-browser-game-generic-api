@@ -1,10 +1,10 @@
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import core.storage.H2Database
-import core.impl.EngineH2
 import core.util.OmenConfigValidator
+import impl.EngineH2
 import model.EngineConfig
 import org.scalatest.{BeforeAndAfter, Matchers, WordSpec}
 import spray.json.DefaultJsonProtocol
+import storage.H2Database
 import utils.TestTimeProvider
 
 class TestBed(id: String) extends WordSpec with BeforeAndAfter with H2Database with Matchers with ScalatestRouteTest with DefaultJsonProtocol {

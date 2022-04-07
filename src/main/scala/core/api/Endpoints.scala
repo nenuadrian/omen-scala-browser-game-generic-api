@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.{Directive1, Route, StandardRoute}
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import core.base.EngineBase
-import core.impl.EngineH2
+import impl.EngineH2
 import model.json.JsonSupport._
 import model._
 import org.apache.logging.log4j.scala.Logging

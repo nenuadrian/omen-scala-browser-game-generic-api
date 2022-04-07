@@ -1,4 +1,4 @@
-package core.impl
+package impl
 
 import core.base.EngineBase
 import core.util.TimeProvider
