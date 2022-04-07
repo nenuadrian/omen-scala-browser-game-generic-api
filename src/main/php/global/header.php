@@ -20,7 +20,7 @@ function GET($url) {
     $apiCalls++;
     $data = json_decode(json_encode($response->body), true);
     if (!isset($data['data'])) {
-        throw new Exception("Undefined data: " . $response->body);
+        throw new Exception("Undefined data: " . json_encode($response->body));
     }
     return $data['data'];
 }

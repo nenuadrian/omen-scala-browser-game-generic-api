@@ -37,5 +37,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 libraryDependencies += "org.neo4j" % "neo4j-community" % "4.4.5"
 libraryDependencies += "net.jcazevedo" %% "moultingyaml" % "0.4.0"
 libraryDependencies += "commons-io" % "commons-io" % "2.6"
- 
+libraryDependencies += "org.mongodb" % "mongodb-driver-sync" % "4.6.0-alpha0"
+
  

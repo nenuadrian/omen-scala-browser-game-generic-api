@@ -3,7 +3,7 @@ package core.base
 import model.{Attribute, Entity, Task}
 
 abstract class StorageEngine {
-   def tasks(ids: List[String] = List(), entities: List[String] = List()): List[Task]
+  def tasks(ids: List[String] = List(), entities: List[String] = List()): List[Task]
   def entitiesWithPlayerId(primaryParentEntityId: Option[String], parent_entity_id: Option[String]): List[Entity]
   def attributesForEntities(entities: List[String]): Map[String, List[Attribute]]
   def put[T](e: T): T

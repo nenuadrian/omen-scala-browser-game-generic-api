@@ -5,12 +5,16 @@ import akka.stream.ActorMaterializer
 import core.api.Endpoints
 import core.util.TimeProvider
 import model._
-import org.apache.commons.dbcp2.BasicDataSource
+import org.neo4j.dbms.api.{DatabaseManagementService, DatabaseManagementServiceBuilder}
 import org.apache.logging.log4j.scala.Logging
+import org.neo4j.graphdb.GraphDatabaseService
 
+import java.io.File
 import scala.concurrent.ExecutionContextExecutor
 
-abstract class EngineBase(val config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)(implicit storageEngine: StorageEngine, timeProvider: TimeProvider) extends Logging {
+abstract class EngineBase(val config: EngineConfig, leaderboardAgent:
+  (Entity, List[Entity]) => List[(String, Int)], cronsEnabled: Boolean = true)
+                         (implicit storageEngine: StorageEngine, timeProvider: TimeProvider) extends Logging {
   logger.info("""
                 | _______  __   __  _______  __    _
                 ||       ||  |_|  ||       ||  |  | |
@@ -26,6 +30,10 @@ abstract class EngineBase(val config: EngineConfig, leaderboardAgent: (Entity, L
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
   val webRoutes = new Endpoints(this)
+
+  // https://github.com/neo4j/neo4j-documentation/blob/4.4/embedded-examples/src/main/java/org/neo4j/examples/EmbeddedNeo4j.java
+  //val managementService: DatabaseManagementService = new DatabaseManagementServiceBuilder(new File(System.getProperty("java.io.tmpdir")).toPath).build
+  //val graphDb: GraphDatabaseService = managementService.database("omen")
 
   def createTask(entity_id: String, req: CreateTaskRequest): Task
   def createEntity(createEntityRequest: CreateEntityRequest): EntityCreationResponse

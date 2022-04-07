@@ -12,8 +12,6 @@ import scala.util.{Properties, Random}
 import spray.json._
 
 class H2Database(implicit timeProvider: TimeProvider, config: EngineConfig) extends StorageEngine {
-  import model.TaskProtocol._
-
   private implicit def rs2Attribute(rs: ResultSet): Attribute =
     Attribute(rs.getString("name"), rs.getString("entity_id"), Some(rs.getString("value")),
       rs.getLong("last_hourly_timestamp"))
