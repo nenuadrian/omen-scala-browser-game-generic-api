@@ -1,6 +1,6 @@
 # Omen Engine
 
-A backend server API, driven mainly by configuration (YAML), which allows you to define the relationships between entities of your game and leverage the API in a thin UI layer on top (that you need to create). 
+A backend server API (no graphics in the core, but a sample UI is presented), driven mainly by configuration (YAML), which allows you to define the relationships between entities of your game and leverage the API in a thin UI layer on top (that you need to create). 
 
 This means you can focus on the user experience and gameplay, and less on the back-end models, storage and scalability.
 
