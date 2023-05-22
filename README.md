@@ -1,20 +1,21 @@
 # Omen Engine
 
-A backend server API (no graphics in the core, but a sample UI is presented), driven mainly by configuration (YAML), which allows you to define the relationships between entities of your game and leverage the API in a thin UI layer on top (that you need to create). 
 
-This means you can focus on the user experience and gameplay, and less on the back-end models, storage and scalability.
+The backend server API, devoid of graphical elements in its core, but accompanied by a sample UI, operates primarily through configuration files (YAML). It facilitates the establishment of connections between various entities within your game and empowers you to leverage the API through a minimal UI layer (which you will need to create).
 
-The engine is capable of validating your config, providing visualisations of the relationships between entities, processing formulas, and much more.
+This approach allows you to prioritize user experience and gameplay, while minimizing the need to extensively focus on backend models, storage, and scalability concerns.
 
-The system is pretty much an entity management system, where relationships can be defined between them, and formulas uses to derive attributes based on this hierarchy.
+The engine possesses several capabilities, including the validation of configurations, providing visual representations of entity relationships, executing formulas, and much more.
+
+Effectively, the system functions as an entity management system, enabling the definition of relationships between entities and utilizing formulas to derive attributes based on this hierarchical structure.
 
 ## Recommended usage pattern
 
-Have a database of your own, separate of that of the engine. Leverage the engine API for things like storing entities with relationships that have formulas between them (e.g. a building needing other things the player has such as abilities to be certain levels).
+Have a dedicated database that operates independently from the engine's default database. Utilize the engine API to facilitate the storage of entities with interconnected relationships, involving formulas between them. For instance, this can be applied to scenarios where a building necessitates certain player abilities at specific levels.
 
-Use Omen to create an entity for societies/organizations/guilds and even to store their main attributes, especially game element ones that you may want in future to use in other relationships (e.g. maybe societies can own a building).
+Leverage Omen to create an entity framework for societies, organizations, guilds, and even store their primary attributes, especially those related to game elements that may be utilized in future relationships. As an example, societies could potentially own buildings.
 
-Leverage your own database of extra information storage, for example additional metadata about a player. Or for example if you want players to apply to join a society. Tell Omen to add a player to a society only when the application is approved.
+Make use of your own database for supplementary information storage. This can involve additional metadata about players or support functionalities such as player applications to join a society. With Omen, configure the system to add a player to a society only upon approval of their application.
 
 
 ## Sample YAML game definition
