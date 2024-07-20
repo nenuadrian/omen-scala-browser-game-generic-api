@@ -49,7 +49,7 @@ All responses are in this JSON format:
 |----------------------------------------------|--------|------------------------------------------------|-----------------------------------------------------|
 | ping                                         | GET    |                                                | Check status of server                              |
 | configuration                                | GET    |                                                | JSON version of the YAML configuration              |
-| player                                       | PUT    | Create new player entity                       | JSON version of the YAML configuration              |
+| player                                       | PUT    | Create new player entity                       | Creates player and provides their ID                |
 | entities                                     | POST   |                                                | Find entities via a EntitiesQuery                   |
 | entities                                     | PUT    | Create new entity                              | Create Entity                                       |
 | entities/{entityId}                          | GET    | primaryParentEntityId?                         | Get entity info                                     |
