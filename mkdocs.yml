@@ -1,0 +1,18 @@
+site_name: Omen Engine
+site_description: Scala-based browser game backend engine driven by YAML configuration.
+repo_url: https://github.com/nenuadrian/omen-scala-browser-game-generic-api
+repo_name: nenuadrian/omen-scala-browser-game-generic-api
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - API: api.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - admonition
