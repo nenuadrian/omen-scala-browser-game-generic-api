@@ -16,6 +16,7 @@ The repository includes:
 - A sample YAML game definition at `src/main/resources/game_configs/space.yaml`
 - A sample PHP UI layer at `src/main/php/`
 - Automated tests that simulate gameplay behavior
+- A code architecture walkthrough in `Architecture & Code`
 
 ## Visualized tech tree
 

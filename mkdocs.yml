@@ -4,15 +4,38 @@ repo_url: https://github.com/nenuadrian/omen-scala-browser-game-generic-api
 repo_name: nenuadrian/omen-scala-browser-game-generic-api
 
 theme:
-  name: readthedocs
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+    - search.suggest
+  palette:
+    - scheme: default
+      primary: teal
+      accent: cyan
 
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
   - API: api.md
+  - Architecture & Code: architecture.md
+
+plugins:
+  - search
 
 markdown_extensions:
   - toc:
       permalink: true
   - tables
   - admonition
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - javascripts/mermaid.js
