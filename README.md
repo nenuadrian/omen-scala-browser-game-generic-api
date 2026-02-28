@@ -1,14 +1,14 @@
 # Omen Engine
-
+ 
 [![Scala CI](https://github.com/nenuadrian/omen-scala-browser-game-generic-api/actions/workflows/scala.yml/badge.svg)](https://github.com/nenuadrian/omen-scala-browser-game-generic-api/actions/workflows/scala.yml)
 
-The backend server API, devoid of graphical elements in its core, but accompanied by a sample UI, operates primarily through configuration files (YAML). It facilitates the establishment of connections between various entities within your game and empowers you to leverage the API through a minimal UI layer (which you will need to create).
+The backend server API, devoid of graphical elements in its core, but accompanied by a sample UI, operates primarily through configuration files (YAML). It helps connect various entities in your game and lets you use the API through a minimal UI layer (which you will need to create).
 
-This approach allows you to prioritize user experience and gameplay, while minimizing the need to extensively focus on backend models, storage, and scalability concerns.
+This approach allows you to prioritise user experience and gameplay, while minimising the need to extensively focus on backend models, storage, and scalability concerns.
 
 The engine possesses several capabilities, including the validation of configurations, providing visual representations of entity relationships, executing formulas, and much more.
 
-Effectively, the system functions as an entity management system, enabling the definition of relationships between entities and utilizing formulas to derive attributes based on this hierarchical structure.
+In practice, the system works as an entity management system, allowing you to define relationships between entities and use formulas to derive attributes based on this hierarchy.
 
 ## Recommended usage pattern
 
@@ -23,13 +23,13 @@ Make use of your own database for supplementary information storage. This can in
 
 [Click here for sample from the codebase](./src/main/resources/game_configs/space.yaml)
 
-The sample focuses on creating a space simulation browser based text game.
+The sample focuses on creating a space simulation browser-based text game.
 
 ## Example game
 
 An example [game UI has been implemented in PHP in this codebase](./src/main/php).
 
-The game uses the space sample config, and leverages PHP as a trusted middle layer between the raw Omen API and the UI. The game-play/business logic is implemented in PHP, leveraging the API to achieve persistence and many of the generic functionalities.
+The game uses the space sample config and leverages PHP as a trusted middle layer between the raw Omen API and the UI. The game-play/business logic is implemented in PHP, leveraging the API to achieve persistence and many of the generic functionalities.
 
 ## API
 
