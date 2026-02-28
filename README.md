@@ -1,6 +1,7 @@
 # Omen Engine
  
 [![Scala CI](https://github.com/nenuadrian/omen-scala-browser-game-generic-api/actions/workflows/scala.yml/badge.svg)](https://github.com/nenuadrian/omen-scala-browser-game-generic-api/actions/workflows/scala.yml)
+[![Deploy Docs](https://github.com/nenuadrian/omen-scala-browser-game-generic-api/actions/workflows/docs.yml/badge.svg)](https://github.com/nenuadrian/omen-scala-browser-game-generic-api/actions/workflows/docs.yml)
 
 The backend server API, devoid of graphical elements in its core, but accompanied by a sample UI, operates primarily through configuration files (YAML). It helps connect various entities in your game and lets you use the API through a minimal UI layer (which you will need to create).
 
