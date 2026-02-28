@@ -142,7 +142,8 @@ class Engine(config: EngineConfig, leaderboardAgent: (Entity, List[Entity]) => L
     if (ids.isEmpty) {
       List()
     } else {
-      storageEngine.entities(ids)
+      val entityIds = ids.toSet
+      storageEngine.entitiesWithPlayerId(None, None).filter(e => entityIds.contains(e.entity_id))
     }
   }
 

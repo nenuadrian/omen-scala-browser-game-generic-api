@@ -38,6 +38,9 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
   }
 
   implicit def tojs[T](a: T)(implicit writer : spray.json.JsonWriter[T]) : spray.json.JsValue = writer.write(a)
+  private def firstDefined(values: Option[String]*): Option[String] = values.collectFirst {
+    case Some(value) if value.nonEmpty => value
+  }
 
   val route: Route = respondWithCORS {
     pathSingleSlash {
@@ -51,7 +54,9 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
         response(() => omen.createEntity(CreateEntityRequest("players", None, None)))
       }
     } ~ pathPrefix("entities") {
-        parameter("primaryParentEntityId" ?) { primaryParentEntityId => {
+        parameters("primaryParentEntityId" ?, "playerId" ?, "player_id" ?, "parent_entity_id" ?) {
+          (primaryParentEntityIdParam, playerIdParam, playerIdSnakeParam, parentEntityId) => {
+          val primaryParentEntityId = firstDefined(primaryParentEntityIdParam, playerIdParam, playerIdSnakeParam)
           pathPrefix(Segment) { entity_id => {
             val currentEntityOptional = omen.entityWithEntityId(entity_id, primaryParentEntityId)
             currentEntityOptional match {
@@ -104,10 +109,10 @@ class Endpoints(omen: EngineBase)(implicit system: ActorSystem, materializer: Ac
                   response(() => currentEntity)
                 }
               }
-              case _ => pathEnd { complete(JsObject("status" -> JsNumber(404))) }
+              case _ => complete(JsObject("status" -> JsNumber(404)))
             }
        }} ~ get {
-          response(() => omen.entitiesWithPlayerId(primaryParentEntityId))
+          response(() => omen.entitiesWithPlayerId(primaryParentEntityId, parentEntityId))
         }
        }} ~ pathEnd {
          post {
